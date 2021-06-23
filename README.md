@@ -11,8 +11,8 @@
 
 2. Open terminal in this directory and type
     ```
-    g++ game.cpp board.cpp
-    ./a.out
+    g++ game.cpp board.cpp -o game.out
+    ./game.out
     ```
 3. Congratulations! You have successfully run the app in the terminal!
 
