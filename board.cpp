@@ -47,7 +47,20 @@ int Board::draw_number(int number) {
 
         for (int i = 0; i < size / 2; ++i)
             std::cout << " ";
-        std::cout << numbers[number]; // << " " << local_size;
+
+        switch (numbers[number][0]) {
+        case 'X':
+            std::cout << "\e[1;96m" << numbers[number]; // << "\033[0m";
+            break;
+        case 'O':
+            std::cout << "\e[1;31m" << numbers[number]; // << "\033[0m";
+            break;
+        default:
+            std::cout << numbers[number];
+            break;
+        }
+        std::cout << "\033[0m";
+        // std::cout << numbers[number]; // << " " << local_size;
         for (int i = 0; i < local_size / 2; ++i)
             std::cout << " ";
 
@@ -71,8 +84,9 @@ void Board::draw() {
     std::system("clear");
 #endif
 
-    std::cout << "   Console tic-tac-toe game" << std::endl;
-    std::cout << "Player 1 <O> - - - Player 2 <X>" << std::endl;
+    std::cout << "   \e[30;42mConsole tic-tac-toe game" << std::endl;
+    std::cout << "Player 1 <O> - - - Player 2 <X> \033[0m" << std::endl;
+    std::cout << std::endl;
     std::cout << std::endl;
 
     int board_number = 1;
@@ -159,18 +173,39 @@ bool Board::check_draw() {
 }
 
 bool Board::check_input(std::string number) {
-    // here: check if number>size*size(last box)
+    // make this function more contained!!!!!!!!
+    if (number.length() > 2) {
+        std::cout << "This number is not in range! Try another one!" << std::endl;
+        sleep(1);
+        return false;
+    }
 
-    if (number.length() == 2)
-        return true; // fiiiix it!!
+    if (number.length() == 2) {
+        for (int i = 0; i < number.length(); ++i)
+            if (number[i] < 48 || number[i] > 56) {
+                std::cout << "This is not a number! Try another one!" << std::endl;
+                sleep(1);
+                return false;
+            }
+
+        int integer_number = ((int)number[0] - 48) * 10 + ((int)number[1] - 48);
+
+        if (integer_number > size * size || integer_number <= 0) {
+            std::cout << "This number is not in range! Try another one!" << std::endl;
+            sleep(1);
+            return false;
+        }
+        return true;
+    }
+
     int integer_number = (int)number[0] - '0';
 
-    if (integer_number < 1 || integer_number > 9) {
+    if (integer_number < 1 || integer_number > 9 || integer_number <= 0) {
         std::cout << "This is not a number! Try another one!" << std::endl;
         sleep(1);
         return false;
     }
-    if (numbers[integer_number] == "O" || numbers[integer_number] == "X") {
+    if (numbers[integer_number][0] == 'O' || numbers[integer_number][0] == 'X') {
         std::cout << "This number is taken. Try another one!" << std::endl;
         sleep(1);
         return false;
@@ -181,8 +216,12 @@ bool Board::check_input(std::string number) {
 
 void Board::set_size() {
     int board_size;
-    std::cout << "Please enter the board size (number from 3 to 10): ";
+    std::cout << "\e[3mPlease enter the board size (number from 3 to 9): \033[0m";
     std::cin >> board_size;
+    while (board_size > 9 || board_size < 3) {
+        std::cout << "\e[101mThe size is not a number between 3 and 9! Try another one:\033[0m";
+        std::cin >> board_size;
+    }
 
     size = board_size;
 }
